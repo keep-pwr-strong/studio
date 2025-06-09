@@ -66,7 +66,7 @@ export function Chat({
     fetch: fetchWithErrorHandlers,
     experimental_prepareRequestBody: (body) => ({
       id,
-      message: body.messages.at(-1),
+      messages: body.messages,
       selectedChatModel: initialChatModel,
       selectedVisibilityType: visibilityType,
     }),

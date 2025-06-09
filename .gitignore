@@ -12,6 +12,7 @@ coverage
 .next/
 out/
 build
+.debug
 
 # misc
 .DS_Store

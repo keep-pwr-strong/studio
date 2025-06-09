@@ -1,37 +1,48 @@
+import { ChatOpenAI } from '@langchain/openai';
+import { openai } from '@ai-sdk/openai';
+
 import {
   customProvider,
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from 'ai';
-import { xai } from '@ai-sdk/xai';
-import { isTestEnvironment } from '../constants';
-import {
-  artifactModel,
-  chatModel,
-  reasoningModel,
-  titleModel,
-} from './models.test';
 
-export const myProvider = isTestEnvironment
-  ? customProvider({
-      languageModels: {
-        'chat-model': chatModel,
-        'chat-model-reasoning': reasoningModel,
-        'title-model': titleModel,
-        'artifact-model': artifactModel,
-      },
-    })
-  : customProvider({
-      languageModels: {
-        'chat-model': xai('grok-2-vision-1212'),
-        'chat-model-reasoning': wrapLanguageModel({
-          model: xai('grok-3-mini-beta'),
-          middleware: extractReasoningMiddleware({ tagName: 'think' }),
-        }),
-        'title-model': xai('grok-2-1212'),
-        'artifact-model': xai('grok-2-1212'),
-      },
-      imageModels: {
-        'small-model': xai.image('grok-2-image'),
-      },
-    });
+const OPENAI_MODEL_FULL_STREAMING = process.env.OPENAI_MODEL_FULL_STREAMING;
+const OPENAI_MODEL_LITE_GENERATIVE = process.env.OPENAI_MODEL_LITE_GENERATIVE;
+
+console.log('[AI Providers] OPENAI_MODEL_FULL_STREAMING:', OPENAI_MODEL_FULL_STREAMING);
+console.log('[AI Providers] OPENAI_MODEL_LITE_GENERATIVE:', OPENAI_MODEL_LITE_GENERATIVE);
+
+// Higher quality, streaming model
+export const modelFullStreaming = new ChatOpenAI({
+  streaming: true,
+  model: OPENAI_MODEL_FULL_STREAMING,
+  cache: true,
+  modelKwargs: { max_tokens: 16000 },
+  configuration: {
+    baseURL: "https://openrouter.ai/api/v1",
+  }
+});
+
+// Fast, inexpensive, non-streaming model.
+export const modelLiteGenerative = new ChatOpenAI({
+  streaming: false, // Switch to non-streaming for classification since we only need the final result
+  model: OPENAI_MODEL_LITE_GENERATIVE,
+  cache: true,
+  configuration: {
+    baseURL: "https://openrouter.ai/api/v1",
+  }
+});
+
+
+export const myProvider = customProvider({
+  languageModels: {
+    'chat-model': openai('OPENAI_MODEL_LITE_GENERATIVE'),
+    'chat-model-reasoning': wrapLanguageModel({
+      model: openai('OPENAI_MODEL_LITE_GENERATIVE'),
+      middleware: extractReasoningMiddleware({ tagName: 'think' }),
+    }),
+    'title-model': openai('OPENAI_MODEL_LITE_GENERATIVE'),
+    'artifact-model': openai('OPENAI_MODEL_LITE_GENERATIVE'),
+  }
+});
