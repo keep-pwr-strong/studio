@@ -37,12 +37,12 @@ function PureSuggestedActions({
       initialIntent: UserIntent.GenerateTaskList
     },
 
-    {
-      title: 'Step 4: Generate code for my VIDA based on task list',
-      label: STAGE3_TEST_PROMPT2.substring(0, 100) + '...',
-      action: STAGE3_TEST_PROMPT2,
-      initialIntent: UserIntent.GenerateCode
-    },
+    // {
+    //   title: 'Step 4: Generate code for my VIDA based on task list',
+    //   label: STAGE3_TEST_PROMPT2.substring(0, 100) + '...',
+    //   action: STAGE3_TEST_PROMPT2,
+    //   initialIntent: UserIntent.GenerateCode
+    // },
 
   ];
 
