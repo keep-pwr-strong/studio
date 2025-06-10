@@ -1,6 +1,6 @@
 import archiver from 'archiver';
 import { put } from '@vercel/blob';
-import Ajv from 'ajv';
+import * as Ajv from 'ajv';
 
 export type CodeFile = {
     path: string;
@@ -35,7 +35,7 @@ export const codeProjectJSONSchema = `
 
 export async function validateCodeProjectJSON(jsonInput: string): Promise<void> {
     // Create a new Ajv instance
-    const ajv = new Ajv({ allErrors: true });
+    const ajv = new Ajv.default({ allErrors: true });
 
     // Parse the schema
     const schema = JSON.parse(codeProjectJSONSchema);
