@@ -107,7 +107,7 @@ function PureChatHeader({
             <Button
               variant="outline"
               className="p-2"
-              onClick={() => window.open('https://github.com/Layr-Labs/studio', '_blank')}
+              onClick={() => window.open('https://github.com/pwrlabs', '_blank')}
               aria-label="GitHub Repository"
             >
               <GitIcon/>

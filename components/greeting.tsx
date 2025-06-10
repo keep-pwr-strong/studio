@@ -14,7 +14,7 @@ export const Greeting = () => {
         transition={{ delay: 0.5 }}
         className="text-4xl"
       >
-        What would you like to <span className="font-semibold text-[#1A0C6D] dark:text-[#B7C0E9]">build</span>?
+        What would you like to <span className="font-semibold text-[#0f0c6d] dark:text-[#b7cee9]">build</span>?
       </motion.div>
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -23,7 +23,7 @@ export const Greeting = () => {
         transition={{ delay: 0.6 }}
         className="text-lg text-zinc-500 mt-5"
       >
-        Realize your <a href="https://docs.pwrlabs.io/pwrchain/vidas/vida" target="_blank" rel="noopener noreferrer" className="text-[#1A0C6D]  dark:text-[#B7C0E9]">PWR Chain VIDAs</a> as an Idea, Design Tech Spec, or Prototype Code.
+        Build, Innovate, Integrate with <a href="https://pwrlabs.io" target="_blank" rel="noopener noreferrer" className="text-[#0f0c6d]  dark:text-[#b7cee9]">PWR Chain</a>
       </motion.div>
     </div>
   );

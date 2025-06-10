@@ -2,9 +2,6 @@
 const PWRCHAIN_DOCS_OVERVIEW_URL = process.env.PWRCHAIN_DOCS_OVERVIEW_URL as string;
 const PWRCHAIN_DEVELOPERS_DOCS_URL = process.env.PWRCHAIN_DEVELOPERS_DOCS_URL as string;
 
-const EIGENLAYER_DOCS_OVERVIEW_URL = process.env.EIGENLAYER_DOCS_OVERVIEW_URL as string;
-const EIGENLAYER_MIDDLEWARE_DOCS_URL = process.env.EIGENLAYER_MIDDLEWARE_DOCS_URL as string;
-
 if (!PWRCHAIN_DOCS_OVERVIEW_URL || !PWRCHAIN_DEVELOPERS_DOCS_URL) {
   console.log('loadContext: One or more required environment variables for context URLs are missing.');
   throw new Error('One or more required environment variables for context URLs are missing.');
