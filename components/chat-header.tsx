@@ -81,7 +81,7 @@ function PureChatHeader({
               onClick={() => window.open("https://pwrchain.io", '_blank')}
             >
               <Image
-                src="/images/pwrlabs-logo.avif"
+                src="/favicon.ico"
                 alt="PWR Chain Logo"
                 className="h-6 w-auto"
                 width={24}
