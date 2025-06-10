@@ -78,7 +78,11 @@ export async function POST(request: Request) {
           chatId: id,
           id: userMessage.id,
           role: 'user',
-          parts: userMessage.parts,
+          parts:
+            userMessage.parts ??
+            (userMessage.content
+              ? [{ type: 'text', text: userMessage.content }]
+              : []),
           attachments: userMessage.experimental_attachments ?? [],
           createdAt: new Date(),
         },
@@ -102,7 +106,7 @@ export async function POST(request: Request) {
                 id: assistantId,
                 chatId: id,
                 role: 'assistant',
-                parts: [{ type: 'text', content }],
+                parts: [{ type: 'text', text: content }],
                 createdAt: new Date(),
                 attachments: [],
               },

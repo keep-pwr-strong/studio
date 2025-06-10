@@ -13,6 +13,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import type { Session } from 'next-auth';
 import { useTheme } from 'next-themes';
 import { Menu, Check } from 'lucide-react';
+import { SidebarToggle } from '@/components/sidebar-toggle';
+import { ModelSelector } from '@/components/model-selector';
+import { VisibilitySelector } from '@/components/visibility-selector';
 
 function PureChatHeader({
   chatId,
@@ -31,37 +34,24 @@ function PureChatHeader({
   const { open } = useSidebar();
 
   const { width: windowWidth } = useWindowSize();
-  const { setTheme, theme } = useTheme();
+  // const { setTheme, theme } = useTheme();
 
   return (
     <header className="flex sticky top-0 bg-background py-1.5 items-center px-[20px] md:px-[20px] gap-2 justify-between">
-      {/* <SidebarToggle /> */}
       {/* Right-aligned items (moved to the left) */}
       <div className="flex items-center gap-2">
-        {/* {!isReadonly && (
-          <ModelSelector
-            selectedModelId={selectedModelId}
-            className="order-5 md:order-4"
+        {!isReadonly && (
+          <VisibilitySelector
+            chatId={chatId}
+            selectedVisibilityType={selectedVisibilityType}
+            className="order-1 md:order-3"
           />
-        )} */}
-         <span className="text-l text-muted-foreground font-large">PWR Chain</span>
-         <span className="text-xs text-muted-foreground font-small">(Beta)</span>
+        )}
+        <span className="text-l text-muted-foreground font-large">PWR Chain</span>
+        <span className="text-xs text-muted-foreground font-small sm:mr-2">(Beta)</span>
          
+        <SidebarToggle />
       </div>
-      {/* {!isReadonly && (
-        <ModelSelector
-          session={session}
-          selectedModelId={selectedModelId}
-          className="order-1 md:order-2"
-        />
-      )} */}
-      {/* {!isReadonly && (
-        <VisibilitySelector
-          chatId={chatId}
-          selectedVisibilityType={selectedVisibilityType}
-          className="order-1 md:order-3"
-        />
-      )} */}
 
       {/* Left-aligned items (moved to the right) */}
       <div className="flex items-center gap-2">
@@ -77,7 +67,7 @@ function PureChatHeader({
                 }}
               >
                 <PlusIcon />
-                <span className="md:sr-only">New Chat</span>
+                <span className="sr-only">New Chat</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>New Chat</TooltipContent>
@@ -116,7 +106,7 @@ function PureChatHeader({
           <TooltipContent>GitHub Repository</TooltipContent>
         </Tooltip>
 
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
@@ -144,7 +134,7 @@ function PureChatHeader({
               </DropdownMenuSubContent>
             </DropdownMenuSub>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
     </header>
   );
