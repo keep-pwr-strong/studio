@@ -1,6 +1,6 @@
 {
-  "name": "ai-chatbot",
-  "version": "3.0.23",
+  "name": "pwrchain-ai-chatbot",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
