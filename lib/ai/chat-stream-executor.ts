@@ -13,7 +13,8 @@ import { classifyUserIntent } from './intentManager';
 import { UserIntent } from './types';
 import { basicPrompt, stage1IdeasPrompt, stage2DesignPrompt, stage3TaskListPrompt, stageProgessionPrompt, stage4CodeGenerationPrompt } from './prompts';
 import type { CodeFile } from '../code/generate-code-project';
-import { modelFullStreaming } from './providers';
+import { modelFullStreaming, digitalOceanChatModel } from './providers';
+import { callDigitalOceanAgent } from './digitalocean-providers';
 
 
 interface ExecuteChatStreamParams {
@@ -79,52 +80,98 @@ export async function generateStreamingLLMResponse(
 
   logContentForDebug(systemPrompt, `chat-stream-executor-system-prompt.txt`, 'Chat Stream Executor - System Prompt');
 
-  // Prepend system prompt to the message history
-  const messageHistory = [
-    new SystemMessage(systemPrompt),
-    ...convertUIMessagesToLangChainMessages(messages)
-  ];
-
-
-
+  // Choose the appropriate model based on selectedChatModel
+  const useDigitalOceanAgent = selectedChatModel === 'do-agent';
+  
   try {
-    
-    
-    // Get the raw stream from the model
     let llmResponseStream: ReadableStream<any>;
-    if (intent === UserIntent.GenerateCode) {
-      let responseText;
-      try {
-        console.log('chat-stream-executor: invoking model to generate code');
-        const codeChunk = await modelFullStreaming.invoke(messageHistory);
-        console.log('chat-stream-executor: code generated');
-        
-        let generatedCode = codeChunk.content?.toString() ?? '';
-        console.log('chat-stream-executor: code length:', generatedCode.length);
-        
-        logContentForDebug(generatedCode, `chat-stream-executor-generated-code.txt`, 'Generated Code');
-        
-        // The generated code is already in the correct markdown format.
-        // There is no need to wrap it in another code block.
-        responseText = "Here is your generated code:\n\n" + generatedCode + "\n\nYou can copy this code and use it in your project.";
-
-      } catch (err) {
-        console.log('chat-stream-executor: error generating code', err);
-        responseText = "Unable to generate code due to AI response processing error.\n\nPlease try again or rephrase your request.";
-      }
+    
+    if (useDigitalOceanAgent) {
+      // Use DigitalOcean Agent
+      console.log('chat-stream-executor: using DigitalOcean Agent');
       
-      llmResponseStream = new ReadableStream({
-        start(controller) {
-          controller.enqueue(responseText);
-          controller.close();
+      // Convert UIMessages to the format expected by DO Agent
+      const agentMessages = [
+        { role: 'system', content: systemPrompt },
+        ...messages.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }))
+      ];
+      
+      if (intent === UserIntent.GenerateCode) {
+        try {
+          const response = await callDigitalOceanAgent(agentMessages, {
+            include_retrieval_info: true,
+            include_functions_info: true
+          });
+          
+          const generatedCode = response.choices[0]?.message?.content || '';
+          console.log('chat-stream-executor: DO agent code generated, length:', generatedCode.length);
+          
+          logContentForDebug(generatedCode, `chat-stream-executor-do-agent-code.txt`, 'DigitalOcean Agent Generated Code');
+          
+          const responseText = "Here is your generated code:\n\n" + generatedCode + "\n\nYou can copy this code and use it in your project.";
+          
+          llmResponseStream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(responseText);
+              controller.close();
+            }
+          });
+        } catch (err) {
+          console.log('chat-stream-executor: error with DO agent code generation', err);
+          const responseText = "Unable to generate code due to DigitalOcean Agent error.\n\nPlease try again or rephrase your request.";
+          llmResponseStream = new ReadableStream({
+            start(controller) {
+              controller.enqueue(responseText);
+              controller.close();
+            }
+          });
         }
-      });
+      } else {
+        // For non-code generation, use streaming with DO agent
+        llmResponseStream = await digitalOceanChatModel.stream([
+          new SystemMessage(systemPrompt),
+          ...convertUIMessagesToLangChainMessages(messages)
+        ]);
+      }
     } else {
-      llmResponseStream = await modelFullStreaming.stream(messageHistory);
-    }
+      // Use existing OpenAI logic
+      const messageHistory = [
+        new SystemMessage(systemPrompt),
+        ...convertUIMessagesToLangChainMessages(messages)
+      ];
 
-    // Todo: filter out backticks here?
-      
+      if (intent === UserIntent.GenerateCode) {
+        let responseText;
+        try {
+          console.log('chat-stream-executor: invoking model to generate code');
+          const codeChunk = await modelFullStreaming.invoke(messageHistory);
+          console.log('chat-stream-executor: code generated');
+          
+          let generatedCode = codeChunk.content?.toString() ?? '';
+          console.log('chat-stream-executor: code length:', generatedCode.length);
+          
+          logContentForDebug(generatedCode, `chat-stream-executor-generated-code.txt`, 'Generated Code');
+          
+          responseText = "Here is your generated code:\n\n" + generatedCode + "\n\nYou can copy this code and use it in your project.";
+
+        } catch (err) {
+          console.log('chat-stream-executor: error generating code', err);
+          responseText = "Unable to generate code due to AI response processing error.\n\nPlease try again or rephrase your request.";
+        }
+        
+        llmResponseStream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(responseText);
+            controller.close();
+          }
+        });
+      } else {
+        llmResponseStream = await modelFullStreaming.stream(messageHistory);
+      }
+    }
 
     const [llmResponseStreamCopy1, llmResponseStreamCopy2] = llmResponseStream.tee();
     // log the stream copy without holding up your response
@@ -134,9 +181,7 @@ export async function generateStreamingLLMResponse(
       'Raw LLM response'
     );
 
-
     return llmResponseStreamCopy2;
-
 
   } catch (error) {
     console.error("LLM response generation failed:", error);

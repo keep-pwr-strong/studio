@@ -1,4 +1,4 @@
-export const DEFAULT_CHAT_MODEL: string = 'claude';
+export const DEFAULT_CHAT_MODEL: string = 'do-agent';
 
 export interface ChatModel {
   id: string;
@@ -22,5 +22,9 @@ export const chatModels: Array<ChatModel> = [
     name: 'ChatGPT',
     description: 'ChatGPT by OpenAI',
   },
- 
+  {
+    id: 'do-agent',
+    name: 'DigitalOcean Agent',
+    description: 'Your DigitalOcean AI Agent with custom knowledge base',
+  },
 ];
