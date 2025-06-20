@@ -58,7 +58,7 @@ export async function generateStreamingLLMResponse(
   if (initialIntent) {
     intent = initialIntent;
   } else {
-    intent = await classifyUserIntent(messages);
+    intent = await classifyUserIntent(messages, selectedChatModel);
   }
   console.log('chat-stream-executor: intent used:', intent);
   
@@ -100,35 +100,12 @@ export async function generateStreamingLLMResponse(
       ];
       
       if (intent === UserIntent.GenerateCode) {
-        try {
-          const response = await callDigitalOceanAgent(agentMessages, {
-            include_retrieval_info: true,
-            include_functions_info: true
-          });
-          
-          const generatedCode = response.choices[0]?.message?.content || '';
-          console.log('chat-stream-executor: DO agent code generated, length:', generatedCode.length);
-          
-          logContentForDebug(generatedCode, `chat-stream-executor-do-agent-code.txt`, 'DigitalOcean Agent Generated Code');
-          
-          const responseText = "Here is your generated code:\n\n" + generatedCode + "\n\nYou can copy this code and use it in your project.";
-          
-          llmResponseStream = new ReadableStream({
-            start(controller) {
-              controller.enqueue(responseText);
-              controller.close();
-            }
-          });
-        } catch (err) {
-          console.log('chat-stream-executor: error with DO agent code generation', err);
-          const responseText = "Unable to generate code due to DigitalOcean Agent error.\n\nPlease try again or rephrase your request.";
-          llmResponseStream = new ReadableStream({
-            start(controller) {
-              controller.enqueue(responseText);
-              controller.close();
-            }
-          });
-        }
+        console.log('chat-stream-executor: Trying streaming approach for code generation');
+        // Try streaming approach instead of non-streaming for code generation
+        llmResponseStream = await digitalOceanChatModel.stream([
+          new SystemMessage(systemPrompt),
+          ...convertUIMessagesToLangChainMessages(messages)
+        ]);
       } else {
         // For non-code generation, use streaming with DO agent
         llmResponseStream = await digitalOceanChatModel.stream([
