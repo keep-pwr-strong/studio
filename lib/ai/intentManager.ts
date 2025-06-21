@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { modelLiteGenerative } from '@/lib/ai/providers';
+import { callDigitalOceanAgent } from '@/lib/ai/digitalocean-providers';
 import type { UIMessage } from 'ai';
 import { SystemMessage, HumanMessage } from '@langchain/core/messages';
 import { UserIntent } from './types'; // Import from the new file
@@ -16,10 +17,7 @@ const IntentClassificationSchema = z.object({
 });
 
 // First LLM: classify intent
-export async function classifyUserIntent(messages: UIMessage[]): Promise<UserIntent> {
-
-  // Create a model with structured output
-  const structuredModel = modelLiteGenerative.withStructuredOutput(IntentClassificationSchema);
+export async function classifyUserIntent(messages: UIMessage[], selectedChatModel?: string): Promise<UserIntent> {
 
   const systemPrompt = `
     You are a classifier.
@@ -32,21 +30,52 @@ export async function classifyUserIntent(messages: UIMessage[]): Promise<UserInt
     Classify the intent based on the conversation.
 
     If the user's response to the question "Would you like to proceed with the code generation for these tasks?" is "Yes", then classify the intent as "Generate code".
+    
+    Respond with ONLY the intent name: "RefineIdea", "GenerateDesign", "GenerateTaskList", "GenerateCode", or "Other".
   `;
 
-  // Only use the last few messages for intent classification to improve efficiency
-  // const recentMessages = messages.slice(-5);
-  // const userText = recentMessages.map(m => m.content).join("\n");
-  const userText = messages.map(m => m.content).join("\n");;
+  const userText = messages.map(m => m.content).join("\n");
 
   try {
-    const result = await structuredModel.invoke([
-      new SystemMessage(systemPrompt),
-      new HumanMessage(userText)
-    ]);
-
-    // Result is already structured according to our schema
-    return result.intent;
+    // Use DigitalOcean agent if selected
+    if (selectedChatModel === 'do-agent' && process.env.DO_AGENT_ENDPOINT && process.env.DO_AGENT_ACCESS_KEY) {
+      console.log('intentManager: using DigitalOcean agent for intent classification');
+      
+      const agentMessages = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userText }
+      ];
+      
+      const response = await callDigitalOceanAgent(agentMessages, { stream: false });
+      const intentText = response.choices[0]?.message?.content?.trim() || '';
+      
+      // Map response to enum
+      switch (intentText) {
+        case 'RefineIdea': return UserIntent.RefineIdea;
+        case 'GenerateDesign': return UserIntent.GenerateDesign;
+        case 'GenerateTaskList': return UserIntent.GenerateTaskList;
+        case 'GenerateCode': return UserIntent.GenerateCode;
+        default: return UserIntent.Other;
+      }
+    }
+    
+    // Fallback to OpenAI if available
+    if (process.env.OPENAI_API_KEY || process.env.OPENAI_MODEL_LITE_GENERATIVE) {
+      console.log('intentManager: using OpenAI for intent classification');
+      
+      const structuredModel = modelLiteGenerative.withStructuredOutput(IntentClassificationSchema);
+      const result = await structuredModel.invoke([
+        new SystemMessage(systemPrompt),
+        new HumanMessage(userText)
+      ]);
+      
+      return result.intent;
+    }
+    
+    // No API keys available - skip classification
+    console.log('intentManager: no API keys available, defaulting to Other intent');
+    return UserIntent.Other;
+    
   } catch (error) {
     console.error("Intent classification failed:", error);
     return UserIntent.Other; // Fallback to Other on error
