@@ -4,6 +4,7 @@ import { customProvider } from 'ai';
 // DigitalOcean GenAI Agent Configuration
 const DO_AGENT_ENDPOINT = process.env.DO_AGENT_ENDPOINT;
 const DO_AGENT_ACCESS_KEY = process.env.DO_AGENT_ACCESS_KEY;
+const OPENAI_MODEL_FULL_STREAMING = process.env.OPENAI_MODEL_FULL_STREAMING || 'gpt-4o-mini';
 
 console.log('[DigitalOcean AI] Agent Endpoint:', DO_AGENT_ENDPOINT);
 console.log('[DigitalOcean AI] Access Key configured:', !!DO_AGENT_ACCESS_KEY);
@@ -15,7 +16,7 @@ const digitalOceanProvider = createOpenAI({
 });
 
 // Export the agent model
-export const digitalOceanAgent = digitalOceanProvider('gpt-3.5-turbo'); // Model name doesn't matter for DO agents
+export const digitalOceanAgent = digitalOceanProvider(OPENAI_MODEL_FULL_STREAMING);
 
 // Custom provider for compatibility
 export const myDigitalOceanProvider = customProvider({

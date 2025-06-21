@@ -21,26 +21,20 @@ export const modelFullStreaming = new ChatOpenAI({
   streaming: true,
   model: OPENAI_MODEL_FULL_STREAMING,
   cache: true,
-  modelKwargs: { max_tokens: 16000 },
-  configuration: {
-    baseURL: "https://openrouter.ai/api/v1",
-  }
+  modelKwargs: { max_tokens: 16000 }
 });
 
 // Fast, inexpensive, non-streaming model.
 export const modelLiteGenerative = new ChatOpenAI({
   streaming: false, // Switch to non-streaming for classification since we only need the final result
   model: OPENAI_MODEL_LITE_GENERATIVE,
-  cache: true,
-  configuration: {
-    baseURL: "https://openrouter.ai/api/v1",
-  }
+  cache: true
 });
 
 // DigitalOcean GenAI Agent as LangChain-compatible model
 export const digitalOceanChatModel = new ChatOpenAI({
   streaming: true,
-  model: 'gpt-3.5-turbo', // Model is handled by the agent
+  model: OPENAI_MODEL_FULL_STREAMING, // Model is handled by the agent
   cache: true,
   modelKwargs: { max_tokens: 16000 },
   configuration: {

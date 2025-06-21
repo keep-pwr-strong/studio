@@ -29,8 +29,8 @@ export async function stage1IdeasPrompt(): Promise<string> {
     const fullPrompt = stage1IdeaRefinementPromptLLMGuidance 
       + '# And you can use the following PWR Chain documentation for additional context:'
       + pwrBasicsDoc 
-      + '# And you can use the following PWR Chain docs overview for additional context:'
-      + pwrChainDocsOverview;
+      // + '# And you can use the following PWR Chain docs overview for additional context:'
+      // + pwrChainDocsOverview;
 
     return fullPrompt;
   } catch (error) {
@@ -51,8 +51,8 @@ export async function stage2DesignPrompt(): Promise<string> {
     const fullPrompt = stage2DesignGenerationPromptText
       + '# And you can use the following PWR Chain documentation for additional context:'
       + pwrBasicsDoc
-      + '# And you can use the following PWR Chain middleware overview for additional context:'
-      + pwrChainDevelopersDocs;
+      // + '# And you can use the following PWR Chain middleware overview for additional context:'
+      // + pwrChainDevelopersDocs;
 
     return fullPrompt;
   } catch (error) {
@@ -71,10 +71,10 @@ export async function stage3TaskListPrompt(): Promise<string> {
 
     // Create the full prompt with fetched data
     const fullPrompt = stage3TaskListPromptText
-      + '# And you can use the following VIDA code examples for additional context:'
-      + pwrChainDevelopersDocs 
-      + '# And you can use the following PWR Chain documentation for additional context:'
-      + pwrBasicsDoc;
+      // + '# And you can use the following VIDA code examples for additional context:'
+      // + pwrChainDevelopersDocs 
+      // + '# And you can use the following PWR Chain documentation for additional context:'
+      // + pwrBasicsDoc;
       // + '# And you can use the following PWR Chain middleware overview for additional context:'
       // + pwrChainDevelopersDocs;
 
@@ -96,12 +96,10 @@ export async function stage4CodeGenerationPrompt(): Promise<string> {
 
     // Create the full prompt with fetched data
     const fullPrompt = stage4CodeGenerationPromptText
-      + '# And you can use the following VIDA code examples code for additional context:'
-      + pwrChainDevelopersDocs 
-      + '# And you can use the following PWR Chain documentation for additional context:'
-      + pwrBasicsDoc
-      // + '# And you can use the following PWR Chain developers docs for additional context:'
-      // + pwrChainDevelopersDocs;
+      // + '# And you can use the following VIDA code examples code for additional context:'
+      // + pwrChainDevelopersDocs 
+      // + '# And you can use the following PWR Chain documentation for additional context:'
+      // + pwrBasicsDoc;
 
     return fullPrompt;
   } catch (error) {
