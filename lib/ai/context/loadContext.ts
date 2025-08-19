@@ -1,6 +1,7 @@
 // URL constants for fetching context data
 const PWRCHAIN_DOCS_OVERVIEW_URL = process.env.PWRCHAIN_DOCS_OVERVIEW_URL as string;
 const PWRCHAIN_DEVELOPERS_DOCS_URL = process.env.PWRCHAIN_DEVELOPERS_DOCS_URL as string;
+const PWRCHAIN_BUILDING_VIDA_DOCS_URL = process.env.PWRCHAIN_BUILDING_VIDA_DOCS_URL as string;
 
 if (!PWRCHAIN_DOCS_OVERVIEW_URL || !PWRCHAIN_DEVELOPERS_DOCS_URL) {
   console.log('loadContext: One or more required environment variables for context URLs are missing.');
@@ -10,8 +11,7 @@ if (!PWRCHAIN_DOCS_OVERVIEW_URL || !PWRCHAIN_DEVELOPERS_DOCS_URL) {
 // Cache variables to store fetched data
 let pwrChainDocsCache: string | null = null;
 let pwrChainDocsMiddlewareCache: string | null = null;
-let helloWorldAVSCodeMinCache: string | null = null;
-let helloWorldAVSCodeMinJSONCache: string | null = null;
+let pwrChainBuildingVidasDocsCache: string | null = null;
 
 /**
  * Fetches the PWR Chain docs overview, using a cached version if available.
@@ -78,5 +78,39 @@ export async function fetchPwrChainDevelopersDocs(): Promise<string> {
     console.error("Error fetching PWR Chain middleware docs:", error);
     // Return a descriptive error message or rethrow
     return 'Error loading PWR Chain middleware documentation.'; 
+  }
+}
+
+/**
+ * Fetches the PWR Chain building VIDA docs, using a cached version if available.
+ */
+export async function fetchPwrChainBuildingVidasDocs(): Promise<string> {
+  // Return cached docs if available
+  if (pwrChainBuildingVidasDocsCache) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('loadContext: fetchPwrChainBuildingVidasDocs: returning cached docs');
+    }
+    return pwrChainBuildingVidasDocsCache;
+  } else {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('loadContext: fetchPwrChainBuildingVidasDocs: fetching new docs');
+    }
+  }
+
+  try {
+    const response = await fetch(PWRCHAIN_BUILDING_VIDA_DOCS_URL);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PWR Chain building VIDA docs: ${response.statusText}`);
+    }
+    const pwrChainBuildingVidasDocs = await response.text();
+
+    // Cache the docs for future use
+    pwrChainBuildingVidasDocsCache = pwrChainBuildingVidasDocs;
+
+    return pwrChainBuildingVidasDocs;
+  } catch (error) {
+    console.error("Error fetching PWR Chain building VIDA docs:", error);
+    // Return a descriptive error message or rethrow
+    return 'Error loading PWR Chain building VIDA documentation.'; 
   }
 }

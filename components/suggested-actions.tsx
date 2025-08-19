@@ -90,15 +90,15 @@ function PureSuggestedActions({
 export const SuggestedActions = memo(PureSuggestedActions, () => true);
 
 const STAGE1_TEST_PROMPT1 = `
-Give me feedback on my VIDA idea. My idea is to build a decentralized ETH token price oracle VIDA using multiple off-chain price feeds (CoinMarketCap, Coingecko, DEX APIs, etc.) that anchors aggregated price data to the PWR Chain.
+Give me feedback on my VIDA idea. I want to build a decentralized social media platform where users can post messages, share content, and interact without relying on centralized servers. The VIDA would use PWR Chain's high-speed transaction processing to handle real-time social interactions, with all posts and user data stored immutably on-chain.
 `;
 
 const STAGE2_TEST_PROMPT1 = `
-Help me generate a technical VIDA design spec for a decentralized ETH token price oracle built on PWR Chain. It should read off-chain prices from multiple sources (CoinMarketCap, Coingecko, DEXs) and aggregate them in a verifiable way, anchoring the results to the PWR ledger.
+Help me generate a technical design spec for a supply chain transparency VIDA on PWR Chain. This stateful VIDA should track products from manufacturer to consumer, recording each step (production, shipping, quality checks, delivery) immutably on-chain. The system needs to ensure data integrity across multiple execution instances and provide real-time visibility to all stakeholders.
 `;
 
 const STAGE3_TEST_PROMPT1 = `
-Help me generate a task list to build a VIDA on PWR Chain. My VIDA will be a decentralized ETH token price oracle that aggregates prices from multiple sources (CoinMarketCap, Coingecko, DEX APIs) and anchors the results immutably to the chain.
+Help me generate a task list to build a decentralized gaming leaderboard VIDA on PWR Chain. This system should track player scores, achievements, and tournaments across multiple games, create global rankings, and distribute rewards automatically. The VIDA needs to handle thousands of score updates per minute while preventing cheating through verifiable game state validation.
 `;
 
 

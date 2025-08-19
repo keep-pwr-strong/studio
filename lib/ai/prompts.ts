@@ -1,6 +1,10 @@
 import type { ArtifactKind } from '@/components/artifact';
+import {
+  fetchPwrChainDevelopersDocs,
+  fetchPwrChainDocsOverview,
+  fetchPwrChainBuildingVidasDocs,
+} from './context/loadContext';
 import { pwrBasicsDoc } from './context/pwrBasics';
-import { fetchPwrChainDevelopersDocs, fetchPwrChainDocsOverview } from './context/loadContext';
 import { stage1IdeaRefinementPromptLLMGuidance } from './prompts/stage1-idea-refinement';
 import { stage2DesignGenerationPromptText } from './prompts/stage2-design-generation';
 import { stage3TaskListPromptText } from './prompts/stage3-task-list-generation';
@@ -8,10 +12,10 @@ import { stage4CodeGenerationPromptText } from './prompts/stage4-code-generation
 
 
 export const stageProgessionPrompt =  `Help the user with each stage of their VIDA development journey. Encourage them to move to the next stage when they are ready.
-- Stage 1: Refine their VIDA (Verifiable Immutable Data Applications) idea
-- Stage 2: Generate their VIDA Design Tech Spec
-- Stage 3: Generate their VIDA Task List
-- Stage 4: Generate their VIDA Prototype code
+- Stage 1: Refine VIDA ideas (Social Media, Enterprise, Gaming, etc.)
+- Stage 2: Generate technical design specs for their chosen VIDA type
+- Stage 3: Generate implementation task lists
+- Stage 4: Generate prototype code
 `;
 
 export const basicPrompt =
@@ -23,12 +27,12 @@ export const basicPrompt =
 export async function stage1IdeasPrompt(): Promise<string> {
   try {
     console.log('prompts: generating stage 1 ideas prompt');
-    const pwrChainDocsOverview = await fetchPwrChainDocsOverview();
+    // const pwrChainDocsOverview = await fetchPwrChainDocsOverview();
 
     // Create the full prompt with fetched data
     const fullPrompt = stage1IdeaRefinementPromptLLMGuidance 
       + '# And you can use the following PWR Chain documentation for additional context:'
-      + pwrBasicsDoc 
+      + pwrBasicsDoc;
       // + '# And you can use the following PWR Chain docs overview for additional context:'
       // + pwrChainDocsOverview;
 
@@ -45,12 +49,12 @@ export async function stage1IdeasPrompt(): Promise<string> {
 export async function stage2DesignPrompt(): Promise<string> {
   try {
     console.log('prompts: generating stage 2 design prompt');
-    const pwrChainDevelopersDocs = await fetchPwrChainDevelopersDocs();
+    // const pwrChainDevelopersDocs = await fetchPwrChainDevelopersDocs();
 
     // Create the full prompt with fetched data
     const fullPrompt = stage2DesignGenerationPromptText
       + '# And you can use the following PWR Chain documentation for additional context:'
-      + pwrBasicsDoc
+      + pwrBasicsDoc;
       // + '# And you can use the following PWR Chain middleware overview for additional context:'
       // + pwrChainDevelopersDocs;
 
@@ -67,14 +71,15 @@ export async function stage2DesignPrompt(): Promise<string> {
 export async function stage3TaskListPrompt(): Promise<string> {
   try {
     console.log('prompts: generating stage 3 task list prompt');
-    const pwrChainDevelopersDocs = await fetchPwrChainDevelopersDocs();
+    // const pwrChainDevelopersDocs = await fetchPwrChainDevelopersDocs();
+    const pwrChainBuildingVidasDocs = await fetchPwrChainBuildingVidasDocs();
 
     // Create the full prompt with fetched data
     const fullPrompt = stage3TaskListPromptText
-      // + '# And you can use the following VIDA code examples for additional context:'
-      // + pwrChainDevelopersDocs 
-      // + '# And you can use the following PWR Chain documentation for additional context:'
-      // + pwrBasicsDoc;
+      + '# And you can use the following Building Stateful VIDAs projects for additional context:'
+      + pwrChainBuildingVidasDocs
+      + '# And you can use the following PWR Chain documentation for additional context:'
+      + pwrBasicsDoc;
       // + '# And you can use the following PWR Chain middleware overview for additional context:'
       // + pwrChainDevelopersDocs;
 
@@ -92,14 +97,17 @@ export async function stage3TaskListPrompt(): Promise<string> {
 export async function stage4CodeGenerationPrompt(): Promise<string> {
   try {
     console.log('prompts: generating stage 4 code prompt');
-    const pwrChainDevelopersDocs = await fetchPwrChainDevelopersDocs();
+    // const pwrChainDevelopersDocs = await fetchPwrChainDevelopersDocs();
+    // const pwrChainBuildingVidasDocs = await fetchPwrChainBuildingVidasDocs();
 
     // Create the full prompt with fetched data
     const fullPrompt = stage4CodeGenerationPromptText
-      // + '# And you can use the following VIDA code examples code for additional context:'
-      // + pwrChainDevelopersDocs 
-      // + '# And you can use the following PWR Chain documentation for additional context:'
-      // + pwrBasicsDoc;
+      // + '# And you can use the following Building Stateful VIDAs projects for additional context:'
+      // + pwrChainBuildingVidasDocs
+      + '# And you can use the following PWR Chain documentation for additional context:'
+      + pwrBasicsDoc;
+      // + '# And you can use the following PWR Chain middleware overview for additional context:'
+      // + pwrChainDevelopersDocs;
 
     return fullPrompt;
   } catch (error) {
